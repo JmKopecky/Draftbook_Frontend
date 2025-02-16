@@ -10,6 +10,11 @@ const SignOnScreen = () => {
     const [username, onChangeUsername] = React.useState('');
     const [password, onChangePassword] = React.useState('');
 
+    const usernameRegex = /^[a-zA-Z-0-9]{6,36}$/
+    const passwordRegex = /^[\w\S]{8,64}$/
+    const [usernameValid, setUsernameValid] = React.useState(true as boolean);
+    const [passwordValid, setpasswordValid] = React.useState(true as boolean);
+    const [hasUserSubmitted, setHasUserSubmitted] = React.useState(false as boolean);
 
     return (
         <View //main/bg area
@@ -30,21 +35,32 @@ const SignOnScreen = () => {
             }}>
                 <Text style={[styles.h1, {paddingBottom: 20}]}>Sign In</Text>
                 <TextInput
-                    style={[styles.textInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
+                    style={[styles.textInput, usernameValid || !hasUserSubmitted ? null : styles.textInputInvalid, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                     placeholder={'Username'}
                     underlineColorAndroid={'transparent'}
                     value={username}
-                    onChangeText={text => onChangeUsername(text)}
+                    onChangeText={text => {
+                        onChangeUsername(text);
+                        setUsernameValid(usernameRegex.test(text))
+                    }}
                 ></TextInput>
                 <TextInput
-                    style={[styles.textInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
+                    style={[styles.textInput, passwordValid || !hasUserSubmitted ? null : styles.textInputInvalid, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                     placeholder={'Password'}
                     underlineColorAndroid={'transparent'}
                     value={password}
-                    onChangeText={text => onChangePassword(text)}
+                    onChangeText={text => {
+                        onChangePassword(text);
+                        setpasswordValid(passwordRegex.test(text));
+                    }}
                 ></TextInput>
                 <AnimButton content="Sign In" runWhenPressed={() => {
-                    console.log("SIGNING IN!");//todo implement
+                    setUsernameValid(usernameRegex.test(username));
+                    setpasswordValid(passwordRegex.test(password));
+                    setHasUserSubmitted(true);
+                    if (usernameValid && passwordValid) {
+                        attemptSignIn(username, password);
+                    }
                 }} addedStyles={{width: '100%'}}/>
             </View>
 
@@ -53,3 +69,8 @@ const SignOnScreen = () => {
 }
 
 export default SignOnScreen;
+
+
+function attemptSignIn(username:string, password:string) {
+    console.log('username: ' + username + ' password: ' + password); //todo implement
+}

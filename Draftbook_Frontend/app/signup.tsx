@@ -11,6 +11,14 @@ const SignUpScreen = () => {
     const [password, onChangePassword] = React.useState('');
     const [confirmPassword, onChangeConfirmPassword] = React.useState('');
 
+    const usernameRegex = /^[a-zA-Z-0-9]{6,36}$/
+    const passwordRegex = /^[\w\S]{8,64}$/
+    const [usernameValid, setUsernameValid] = React.useState(true as boolean);
+    const [passwordValid, setpasswordValid] = React.useState(true as boolean);
+    const [confirmPasswordValid, setconfirmPasswordValid] = React.useState(true as boolean);
+    const [passwordsMatch, setpasswordsMatch] = React.useState(true as boolean);
+    const [hasUserSubmitted, setHasUserSubmitted] = React.useState(false as boolean);
+
 
     return (
         <View //main/bg area
@@ -31,33 +39,57 @@ const SignUpScreen = () => {
             }}>
                 <Text style={[styles.h1, {paddingBottom: 20}]}>Sign Up</Text>
                 <TextInput
-                    style={[styles.textInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
+                    style={[styles.textInput, usernameValid || !hasUserSubmitted ? null : styles.textInputInvalid, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                     placeholder={'Username'}
                     underlineColorAndroid={'transparent'}
                     value={username}
-                    onChangeText={text => onChangeUsername(text)}
+                    onChangeText={text => {
+                        onChangeUsername(text);
+                        setUsernameValid(usernameRegex.test(text))
+                    }}
                 ></TextInput>
                 <TextInput
-                    style={[styles.textInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
+                    style={[styles.textInput, passwordValid || !hasUserSubmitted ? null : styles.textInputInvalid, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                     placeholder={'Password'}
                     underlineColorAndroid={'transparent'}
                     value={password}
-                    onChangeText={text => onChangePassword(text)}
+                    onChangeText={text => {
+                        onChangePassword(text);
+                        setpasswordValid(passwordRegex.test(text));
+                        setconfirmPasswordValid(passwordRegex.test(text));
+                        setpasswordsMatch(text === confirmPassword);
+                    }}
                 ></TextInput>
                 <TextInput
-                    style={[styles.textInput, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
+                    style={[styles.textInput, confirmPasswordValid && passwordsMatch || !hasUserSubmitted ? null : styles.textInputInvalid, Platform.OS === 'web' && ({ outlineStyle: 'none' } as any)]}
                     placeholder={'Confirm Password'}
                     underlineColorAndroid={'transparent'}
                     value={confirmPassword}
-                    onChangeText={text => onChangeConfirmPassword(text)}
+                    onChangeText={text => {
+                        onChangeConfirmPassword(text);
+                        setconfirmPasswordValid(passwordRegex.test(text));
+                        setpasswordsMatch(password === text);
+                    }}
                 ></TextInput>
                 <AnimButton content="Sign Up" runWhenPressed={() => {
-                    console.log("SIGNING UP!");//todo implement
+                    setUsernameValid(usernameRegex.test(username));
+                    setpasswordValid(passwordRegex.test(password));
+                    setconfirmPasswordValid(passwordRegex.test(confirmPassword));
+                    setpasswordsMatch(password === confirmPassword);
+                    setHasUserSubmitted(true);
+                    if (usernameValid && passwordValid && confirmPasswordValid && passwordsMatch) {
+                        attemptSignUp(username, password);
+                    }
                 }} addedStyles={{width: '100%'}}/>
             </View>
-
         </View>
     )
 }
 
 export default SignUpScreen;
+
+
+
+function attemptSignUp(username:string, password:string) {
+    console.log('usr: ' + username + ' ps: ' + password); //todo implement
+}

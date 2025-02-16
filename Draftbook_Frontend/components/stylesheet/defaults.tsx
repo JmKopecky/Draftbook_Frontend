@@ -51,7 +51,12 @@ const style = StyleSheet.create({
         borderColor: Constants.accentColor,
         fontSize: 12,
         fontFamily: 'Roboto Mono',
-        color: Constants.textColor
+        color: Constants.textColor,
+        transitionProperty: 'color',
+        transitionDuration: '0.5s'
+    },
+    textInputInvalid: {
+        color: 'red'
     }
 })
 
