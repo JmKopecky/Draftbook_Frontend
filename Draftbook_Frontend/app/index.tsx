@@ -1,10 +1,14 @@
 import {Pressable, Text, View} from "react-native";
-import {Link} from "expo-router";
+import {Link, useNavigation, useRouter} from "expo-router";
 import styles from "../components/stylesheet/defaults"
 import {backgroundColor} from "@/assets/constants";
+import AnimButton from "@/components/interactable/AnimButton";
 
 
 export default function Index() {
+
+    const router = useRouter();
+
     return (
         <View style={{
             flex: 1,
@@ -16,7 +20,7 @@ export default function Index() {
             rowGap: 10
         }}>
             <Text style={[styles.h1, styles.textCentered, {fontWeight: 'bold'}]}>Welcome to Draftbook!</Text>
-            <Text style={[styles.h6, styles.textCentered]}>The solution to all your writing needs</Text>
+            <Text style={[styles.p, styles.textCentered, {fontSize: 14}]}>The solution to all your writing needs</Text>
 
             <View style={{
                 justifyContent: "space-around",
@@ -25,18 +29,14 @@ export default function Index() {
                 paddingTop: 50,
                 minWidth: '10%'
             }}>
-                <Link href="/signin" asChild style={{width: '100%'}}>
-                    <Pressable style={styles.button}>
-                        <Text style={styles.buttonText}>Sign In</Text>
-                    </Pressable>
-                </Link>
+                <AnimButton content="Sign In" runWhenPressed={() => {
+                    router.push('/signin');
+                }} addedStyles={{width: '100%'}}/>
 
 
-                <Link href="/signup" asChild style={{width: '100%'}}>
-                    <Pressable style={styles.button}>
-                        <Text style={styles.buttonText}>Sign Up</Text>
-                    </Pressable>
-                </Link>
+                <AnimButton content="Sign Up" runWhenPressed={() => {
+                    router.push('/signup');
+                }} addedStyles={{width: '100%'}}/>
             </View>
 
         </View>
