@@ -4,6 +4,7 @@ import * as Util from "@/assets/functions"
 import styles from "@/components/stylesheet/defaults"
 import React from "react";
 import AnimButton from "@/components/interactable/AnimButton";
+import * as Auth from "@/components/networking/authentication";
 
 
 const SignUpScreen = () => {
@@ -91,5 +92,11 @@ export default SignUpScreen;
 
 
 function attemptSignUp(username:string, password:string) {
-    console.log('usr: ' + username + ' ps: ' + password); //todo implement
+    Auth.signUp(username, password).then((result) => {
+        if (result) {
+            console.log("Signed up successfully");
+        } else {
+            console.log("Failed to sign up");
+        }
+    });
 }

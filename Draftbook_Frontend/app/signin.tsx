@@ -4,6 +4,7 @@ import * as Util from "@/assets/functions"
 import styles from "@/components/stylesheet/defaults"
 import React from "react";
 import AnimButton from "@/components/interactable/AnimButton";
+import * as Auth from "@/components/networking/authentication";
 
 
 const SignOnScreen = () => {
@@ -73,4 +74,5 @@ export default SignOnScreen;
 
 function attemptSignIn(username:string, password:string) {
     console.log('username: ' + username + ' password: ' + password); //todo implement
+    Auth.signIn(username, password);
 }
