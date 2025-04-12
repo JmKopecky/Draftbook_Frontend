@@ -5,9 +5,12 @@ import styles from "@/components/stylesheet/defaults"
 import React from "react";
 import AnimButton from "@/components/interactable/AnimButton";
 import * as Auth from "@/components/networking/authentication";
+import {Router, useRouter} from "expo-router";
 
 
 const SignOnScreen = () => {
+    const router = useRouter();
+
     const [username, onChangeUsername] = React.useState('');
     const [password, onChangePassword] = React.useState('');
 
@@ -60,7 +63,7 @@ const SignOnScreen = () => {
                     setpasswordValid(passwordRegex.test(password));
                     setHasUserSubmitted(true);
                     if (usernameValid && passwordValid) {
-                        attemptSignIn(username, password);
+                        attemptSignIn(username, password, router);
                     }
                 }} addedStyles={{width: '100%'}}/>
             </View>
@@ -72,7 +75,14 @@ const SignOnScreen = () => {
 export default SignOnScreen;
 
 
-function attemptSignIn(username:string, password:string) {
+function attemptSignIn(username:string, password:string, router:Router) {
     console.log('username: ' + username + ' password: ' + password); //todo implement
-    Auth.signIn(username, password);
+    Auth.signIn(username, password).then(result => {
+        if (result) {
+            console.log("Signed in successfully");
+            router.push('/dashboard');
+        } else {
+            console.log("Failed to sign in");
+        }
+    });
 }

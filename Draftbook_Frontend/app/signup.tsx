@@ -5,9 +5,12 @@ import styles from "@/components/stylesheet/defaults"
 import React from "react";
 import AnimButton from "@/components/interactable/AnimButton";
 import * as Auth from "@/components/networking/authentication";
+import {Router, useRouter} from "expo-router";
 
 
 const SignUpScreen = () => {
+    const router = useRouter();
+
     const [username, onChangeUsername] = React.useState('');
     const [password, onChangePassword] = React.useState('');
     const [confirmPassword, onChangeConfirmPassword] = React.useState('');
@@ -79,7 +82,7 @@ const SignUpScreen = () => {
                     setpasswordsMatch(password === confirmPassword);
                     setHasUserSubmitted(true);
                     if (usernameValid && passwordValid && confirmPasswordValid && passwordsMatch) {
-                        attemptSignUp(username, password);
+                        attemptSignUp(username, password, router);
                     }
                 }} addedStyles={{width: '100%'}}/>
             </View>
@@ -91,10 +94,11 @@ export default SignUpScreen;
 
 
 
-function attemptSignUp(username:string, password:string) {
+function attemptSignUp(username:string, password:string, router:Router) {
     Auth.signUp(username, password).then((result) => {
         if (result) {
             console.log("Signed up successfully");
+            router.push('/dashboard');
         } else {
             console.log("Failed to sign up");
         }

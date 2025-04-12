@@ -2,23 +2,25 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import {tSVoidKeyword} from "@babel/types";
 
 
-const targetURL = 'https://draftbook.jkopecky.dev/api/auth/'
-
+const targetURL = 'https://draftbook.jkopecky.dev/api/auth/';
 
 
 export async function signUp(username: string, password: string):Promise<boolean> {
+    //make sure we aren't creating an account that already exists
     try {
         if (await doesExist(username)) {
             console.log("Username already exists");
+            await clearStoredData();
             return false;
         }
     } catch (e) {
         console.log("Encountered error determining if username exists: authentication.signUp()");
         console.log(e);
+        await clearStoredData();
         return false;
     }
 
-
+    //attempt to create account (send request)
     const response = await fetch(targetURL + 'create', {
         method: 'POST',
         headers: {
@@ -30,47 +32,99 @@ export async function signUp(username: string, password: string):Promise<boolean
         }),
     });
 
+    //attempt to create account (read response)
     const data = await response.json();
     if (data["error"] !== undefined) {
         if (data["error"] === "authenticate_parse") {
+            await clearStoredData();
             return false;
         }
         if (data["error"] === "username_taken") {
+            await clearStoredData();
             return false;
         }
-        if (data["error"] === "none" && data["authenticated"]) {
-            let usr: string = data["username"];
-            let pw: string = data["password"];
-            const storeData = async (usr: string, pw: string) => {
+        if (data["error"] === "none" && data["authenticated"]) { //success!
+            let token:string = data["token"];
+            const storeData = async (token:string) => {
                 try {
-                    await AsyncStorage.setItem('username', usr);
-                    await AsyncStorage.setItem('password', pw);
+                    const test = await AsyncStorage.setItem("token", token);
                 } catch (e) {
                     // saving error
                     console.log("Error encountered in saving data");
                     console.log(e);
+                    await clearStoredData();
                     return false;
                 }
             };
-            storeData(usr, pw);
+            await storeData(token);
             return true;
         }
     }
+    await clearStoredData();
     return false;
 }
 
 
 
-export function signIn(username:string, password:string) {
+export async function signIn(username:string, password:string) {
     try {
-        if (!doesExist(username)) return; //todo: logic for user indication when provided info does not exist.
+        if (!await doesExist(username)) {
+            console.log("Username does not exist"); //todo logic to inform the user that the account does not exist
+            await clearStoredData();
+            return false;
+        }
     } catch (e) {
         console.log("Encountered error determining if username exists: authentication.signIn()");
         console.log(e);
-        return;
+        await clearStoredData();
+        return false;
     }
 
-    //todo implement sign in
+    //send request to sign in
+    const response = await fetch(targetURL + 'authenticate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            username: username,
+            password: password
+        }),
+    });
+
+    //parse response data
+    const data = await response.json();
+    if (data["error"] !== undefined) {
+        if (data["error"] === "authenticate_parse") {
+            await clearStoredData();
+            return false;
+        }
+        if (data["error"] === "account_nonexistent") {
+            await clearStoredData();
+            return false;
+        }
+        //store sign in data if successful
+        if (data["error"] === "none" && data["authenticated"]) { //success!
+            console.log(data);
+            let token:string = data["token"];
+            console.log(token)
+            const storeData = async (token:string) => {
+                try {
+                    await AsyncStorage.setItem('token', token);
+                } catch (e) {
+                    // saving error
+                    console.log("Error encountered in saving data");
+                    console.log(e);
+                    await clearStoredData();
+                    return false;
+                }
+            };
+            await storeData(token);
+            return true;
+        }
+    }
+    await clearStoredData();
+    return false;
 }
 
 
@@ -99,4 +153,9 @@ async function doesExist(username:string):Promise<boolean> {
         console.log(data);
         throw new Error("Error in assessing whether user exists");
     }
+}
+
+
+async function clearStoredData() {
+    await AsyncStorage.removeItem('token');
 }
