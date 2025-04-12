@@ -1,12 +1,14 @@
 import * as Constants from "@/assets/constants";
-import {Text, View} from "react-native"
+import {Text, View, StyleSheet} from "react-native"
 import styles from "@/components/stylesheet/defaults";
 import React, {useEffect} from "react";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Util from "@/assets/functions";
 
 
 const dashboardScreen = () => {
     const [token, onChangeToken] = React.useState('no_token');
+    const [mode, onChangeMode] = React.useState('Works');
 
     useEffect(() => {
         const firstLoad = async () => {
@@ -41,55 +43,64 @@ const dashboardScreen = () => {
                 height: "90%",
                 width: "15%"
             }}>
-                <View style={{
-                    flexDirection: "row",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                    padding: 5,
-                    width: "100%"
-                }}>
-                    <Text style={[styles.h6]}>Account</Text>
-                </View>
-                <View style={{
-                    flexDirection: "row",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                    padding: 5,
-                    width: "100%"
-                }}>
-                    <Text style={[styles.h6]}>Goals</Text>
-                </View>
-                <View style={{
-                    flexDirection: "row",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                    padding: 5,
-                    width: "100%"
-                }}>
+                <View style={[dashboardStyles.dashboardSidebarElement,
+                    mode == "Works" ?
+                        dashboardStyles.sidebarElementSelected : dashboardStyles.sidebarElementUnselected]}>
                     <Text style={[styles.h6]}>Works</Text>
                 </View>
-                <View style={{
-                    flexDirection: "row",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                    padding: 5,
-                    width: "100%"
-                }}>
+                <View style={[dashboardStyles.dashboardSidebarElement,
+                    mode == "Goals" ?
+                        dashboardStyles.sidebarElementSelected : dashboardStyles.sidebarElementUnselected]}>
+                    <Text style={[styles.h6]}>Goals</Text>
+                </View>
+                <View style={[dashboardStyles.dashboardSidebarElement,
+                    mode == "Stats" ?
+                        dashboardStyles.sidebarElementSelected : dashboardStyles.sidebarElementUnselected]}>
                     <Text style={[styles.h6]}>Stats</Text>
                 </View>
-                <View style={{
-                    flexDirection: "row",
-                    justifyContent: "flex-start",
-                    alignItems: "center",
-                    padding: 5,
-                    width: "100%"
-                }}>
+                <View style={[dashboardStyles.dashboardSidebarElement,
+                    mode == "Account" ?
+                        dashboardStyles.sidebarElementSelected : dashboardStyles.sidebarElementUnselected]}>
+                    <Text style={[styles.h6]}>Account</Text>
+                </View>
+                <View style={[dashboardStyles.dashboardSidebarElement,
+                    mode == "Settings" ?
+                        dashboardStyles.sidebarElementSelected : dashboardStyles.sidebarElementUnselected]}>
                     <Text style={[styles.h6]}>Settings</Text>
                 </View>
             </View>
-            <Text style={[styles.p, {paddingBottom: 20}]}>{token}</Text>
+            <View style={{
+                backgroundColor: Util.darken(Constants.backgroundRGBA, "1%"),
+                height: "100%",
+                width: "80%"
+            }}>
+
+            </View>
         </View>
     )
 }
 
 export default dashboardScreen;
+
+
+const dashboardStyles = StyleSheet.create({
+    dashboardSidebarElement: {
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        alignItems: "center",
+        padding: 15,
+        width: "100%",
+        borderStyle: "solid",
+        borderWidth: 5,
+        borderColor: Util.darken(Constants.backgroundRGBA, "1%")
+    },
+    sidebarElementSelected: {
+        backgroundColor: Util.darken(Constants.backgroundRGBA, "1%")
+    },
+    sidebarElementUnselected: {
+        backgroundColor: Constants.backgroundColor
+    },
+    test: {
+        borderColor: "#ff0000"
+    }
+})
